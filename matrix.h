@@ -2,11 +2,6 @@
 
 #include <map>
 
-/*
-struct{
-  int x;
-  int y;
-} Key; */
 
 template <typename T, T DefaultValue>
 class Matrix {
@@ -24,7 +19,7 @@ public:
 	{
 	    return cell_count;
 	}
-
+	
         // Proxy-объект для ячейки
 	class CellProxy{
 		Matrix& matrix;
@@ -37,26 +32,38 @@ public:
             return it != matrix.elements.end() ? it->second : DefaultValue;
         }
 	
-		// Оператор присваивания = запись в ячейку
+
+        
+	// Оператор присваивания = запись в ячейку
 	CellProxy& operator=(const T& value)
 	{
 	    std::pair<int, int> key{x, y};
-
+            // Значение по умолчанию должно освобождать ячейку
 	    if (value == DefaultValue)
 	    {
-	        matrix.elements.erase(key);
-	        matrix.cell_count--;
+	        if (matrix.elements.count(key) == 1){
+		    matrix.elements.erase(key);
+	            matrix.cell_count--;        
+	        }
+
 	    }
-	    else
-	    {
+	    else 
+	    { // если ячейка не была занята - увеличиваем счетчик
+	      if (matrix.elements.count(key) == 0) 
+	      { 
 	        matrix.elements[key] = value;
 	        matrix.cell_count++;
+	      }
+	      else
+	      {
+	        matrix.elements[key] = value;
+	      }
 	    }
+	
 	    return *this;
 	}
 	};
 	
-
 
 	class RowProxy {
 		Matrix& matrix;
@@ -77,11 +84,8 @@ public:
           }
           
       // Итераторы
-        auto begin() { return elements.begin(); }
-        auto end() { return elements.end(); }
+       auto begin() { return elements.begin(); }
+       auto end() { return elements.end(); }
 
 };
-
-
-
 
